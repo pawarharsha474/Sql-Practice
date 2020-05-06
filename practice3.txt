@@ -1,0 +1,549 @@
+[root@host4 /]# cat /etc/oratab
+#
+
+
+
+# This file is used by ORACLE utilities.  It is created by root.sh
+# and updated by either Database Configuration Assistant while creating
+# a database or ASM Configuration Assistant while creating ASM instance.
+
+# A colon, ':', is used as the field terminator.  A new line terminates
+# the entry.  Lines beginning with a pound sign, '#', are comments.
+#
+# Entries are of the form:
+#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:
+#
+# The first and second fields are the system identifier and home
+# directory of the database respectively.  The third filed indicates
+# to the dbstart utility that the database should , "Y", or should not,
+# "N", be brought up at system boot time.
+#
+# Multiple entries with the same $ORACLE_SID are not allowed.
+#
+#
+orcl11g:/u01/app/jhoracle/product/11.2.0/dbhome_1:N
+ydbase:/u03/app/yoracle/product/11.2.0/dbhome_1:N
+ptorcl:/u01/app/ptoracle/product/12.1.0/dbhome_1:N
+sql:/u01/app/sql/product/11.2.0/dbhome_1:N
+prod:/u01/app/noracle/product/11.2.0/dbhome_1:N
+test:/u01/app/noracle/product/11.2.0/dbhome_1:N
+vorcl:/u01/app/voracle/product/11.2.0/dbhome_1:N
+prod:/u01/app/oracle/product/12.1.0/dbhome_1:N
+test:/u01/app/oracle/product/12.1.0/dbhome_1:N
+dev:/u01/app/cloning/product/12.1.0/dbhome_1:N
+asif:/u01/app/oracle/product/12.1.0/dbhome_2:N
+aalok:/u01/app/sql/product/11.2.0/dbhome_1:N
+
+orcl:/u01/app/ora12c/product/12.1.0/dbhome_1:N
+rman:/u01/app/ora12c/product/12.1.0/dbhome_1:N
+orcl1:/u01/app/ora11goracle/product/12.1.0/dbhome_1:N
+[root@host4 /]# su - sql
+[sql@host4 ~]$ sqlplus
+
+SQL*Plus: Release 11.2.0.4.0 Production on Thu Aug 29 10:38:41 2019
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+Enter user-name: sys as sysdba
+Enter password: 
+Connected to an idle instance.
+
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1620115456 bytes
+Fixed Size		    2253704 bytes
+Variable Size		 1006636152 bytes
+Database Buffers	  603979776 bytes
+Redo Buffers		    7245824 bytes
+Database mounted.
+Database opened.
+SQL> connect hr/hr
+Connected.
+SQL> connect scott/tiger
+Connected.
+SQL> spool '/home/sql/mrunali/practice3.txt'                                            
+SQL> create table emp300 (empno number,ename varchar(25),sal number,constraint emp300_empno_p primary key(empno));
+
+Table created.
+
+SQL> desc emp300;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ EMPNO					   NOT NULL NUMBER
+ ENAME						    VARCHAR2(25)
+ SAL						    NUMBER
+
+SQL> insert into emp300 values(1,'tony',1000);
+
+1 row created.
+
+SQL> insert into emp300 values(1,'mony',6000);
+insert into emp300 values(1,'mony',6000)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SCOTT.EMP300_EMPNO_P) violated
+
+
+SQL> insert into emp300 values(null,'mony',6000);  
+insert into emp300 values(null,'mony',6000)
+                          *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("SCOTT"."EMP300"."EMPNO")
+
+
+SQL> insert into emp300 values('mony',6000);
+insert into emp300 values('mony',6000)
+            *
+ERROR at line 1:
+ORA-00947: not enough values
+
+
+SQL> insert into emp300 values(' ','mony',6000);
+insert into emp300 values(' ','mony',6000)
+                          *
+ERROR at line 1:
+ORA-01722: invalid number
+
+
+SQL> insert into emp300 values(2,'mony',8000);
+insert into emp300 values(3,'jony',6000);
+insert into emp300 values(4,'sony',7000);
+1 row created.
+
+SQL> 
+1 row created.
+
+SQL> select * from emp300;
+insert into emp300 values(4,'sony',7000);select * from emp300
+                                        *
+ERROR at line 1:
+ORA-00911: invalid character
+
+
+SQL> insert into emp300 values(2,'mony',8000),
+insert into emp300 values(3,'jony',6000),
+insert into emp300 values(4,'sony',7000);
+  2    3  insert into emp300 values(2,'mony',8000),
+                                        *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended
+
+
+SQL> insert into emp300(empno,ename,sal) values (&empno,'&ename',&sal);
+Enter value for empno: 2
+Enter value for ename: sony
+Enter value for sal: 3000
+old   1: insert into emp300(empno,ename,sal) values (&empno,'&ename',&sal)
+new   1: insert into emp300(empno,ename,sal) values (2,'sony',3000)
+insert into emp300(empno,ename,sal) values (2,'sony',3000)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SCOTT.EMP300_EMPNO_P) violated
+
+
+SQL> /
+Enter value for empno: 3
+Enter value for ename: jony
+Enter value for sal: 8000
+old   1: insert into emp300(empno,ename,sal) values (&empno,'&ename',&sal)
+new   1: insert into emp300(empno,ename,sal) values (3,'jony',8000)
+insert into emp300(empno,ename,sal) values (3,'jony',8000)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SCOTT.EMP300_EMPNO_P) violated
+
+
+SQL> select * from emp300;
+
+     EMPNO ENAME			    SAL
+---------- ------------------------- ----------
+	 1 tony 			   1000
+	 2 mony 			   8000
+	 3 jony 			   6000
+
+SQL> ^Z^C
+
+SQL> insert into emp300 values(4,'king',7000);
+
+1 row created.
+
+SQL> select * from emp300;
+
+     EMPNO ENAME			    SAL
+---------- ------------------------- ----------
+	 1 tony 			   1000
+	 2 mony 			   8000
+	 3 jony 			   6000
+	 4 king 			   7000
+
+SQL> create table emp400 (empno number, ename varchar(25), sal number, deptno number);
+
+Table created.
+
+SQL> alter table emp400 add(constraint emp400_empno_deptno_p primary key(empno,deptno));
+
+Table altered.
+
+SQL> insert into emp300(empno,ename,sal,deptno) values (&empno,'&ename',&sal,&deptno);
+Enter value for empno: 1
+Enter value for ename: tony
+Enter value for sal: 1000
+Enter value for deptno: 10
+old   1: insert into emp300(empno,ename,sal,deptno) values (&empno,'&ename',&sal,&deptno)
+new   1: insert into emp300(empno,ename,sal,deptno) values (1,'tony',1000,10)
+insert into emp300(empno,ename,sal,deptno) values (1,'tony',1000,10)
+                                   *
+ERROR at line 1:
+ORA-00904: "DEPTNO": invalid identifier
+
+
+SQL> insert into emp400(empno,ename,sal,deptno) values (&empno,'&ename',&sal,&deptno);
+Enter value for empno: 1     
+Enter value for ename: tony
+Enter value for sal: 1000
+Enter value for deptno: 10
+old   1: insert into emp400(empno,ename,sal,deptno) values (&empno,'&ename',&sal,&deptno)
+new   1: insert into emp400(empno,ename,sal,deptno) values (1,'tony',1000,10)
+
+1 row created.
+
+SQL> /
+Enter value for empno: 1
+Enter value for ename: sony 
+Enter value for sal: 3000
+Enter value for deptno: 38
+old   1: insert into emp400(empno,ename,sal,deptno) values (&empno,'&ename',&sal,&deptno)
+new   1: insert into emp400(empno,ename,sal,deptno) values (1,'sony',3000,38)
+
+1 row created.
+
+SQL> /
+Enter value for empno: 1
+Enter value for ename: glory
+Enter value for sal: 5999
+Enter value for deptno: 10
+old   1: insert into emp400(empno,ename,sal,deptno) values (&empno,'&ename',&sal,&deptno)
+new   1: insert into emp400(empno,ename,sal,deptno) values (1,'glory',5999,10)
+insert into emp400(empno,ename,sal,deptno) values (1,'glory',5999,10)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SCOTT.EMP400_EMPNO_DEPTNO_P) violated
+
+
+SQL> select * from emp400;
+
+     EMPNO ENAME			    SAL     DEPTNO
+---------- ------------------------- ---------- ----------
+	 1 tony 			   1000 	10
+	 1 sony 			   3000 	38
+
+SQL> select constraint_name,conatraint_type,table_name 
+from user_constraints
+where table_name ='EMP400';  2    3  
+select constraint_name,conatraint_type,table_name
+                       *
+ERROR at line 1:
+ORA-00904: "CONATRAINT_TYPE": invalid identifier
+
+
+SQL> select constraint_name,conatraint_type,table_name 
+from user_constraints where table_name ='EMP400';  2  
+select constraint_name,conatraint_type,table_name
+                       *
+ERROR at line 1:
+ORA-00904: "CONATRAINT_TYPE": invalid identifier
+
+
+SQL> select constraint_name,constraint_type,table_name 
+from user_constraints where table_name ='EMP400';   2  
+
+CONSTRAINT_NAME 	       C TABLE_NAME
+------------------------------ - ------------------------------
+EMP400_EMPNO_DEPTNO_P	       P EMP400
+
+SQL> desc user_constraints;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ OWNER						    VARCHAR2(30)
+ CONSTRAINT_NAME			   NOT NULL VARCHAR2(30)
+ CONSTRAINT_TYPE				    VARCHAR2(1)
+ TABLE_NAME				   NOT NULL VARCHAR2(30)
+ SEARCH_CONDITION				    LONG
+ R_OWNER					    VARCHAR2(30)
+ R_CONSTRAINT_NAME				    VARCHAR2(30)
+ DELETE_RULE					    VARCHAR2(9)
+ STATUS 					    VARCHAR2(8)
+ DEFERRABLE					    VARCHAR2(14)
+ DEFERRED					    VARCHAR2(9)
+ VALIDATED					    VARCHAR2(13)
+ GENERATED					    VARCHAR2(14)
+ BAD						    VARCHAR2(3)
+ RELY						    VARCHAR2(4)
+ LAST_CHANGE					    DATE
+ INDEX_OWNER					    VARCHAR2(30)
+ INDEX_NAME					    VARCHAR2(30)
+ INVALID					    VARCHAR2(7)
+ VIEW_RELATED					    VARCHAR2(14)
+
+SQL> desc all_cons_columns;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ OWNER					   NOT NULL VARCHAR2(30)
+ CONSTRAINT_NAME			   NOT NULL VARCHAR2(30)
+ TABLE_NAME				   NOT NULL VARCHAR2(30)
+ COLUMN_NAME					    VARCHAR2(4000)
+ POSITION					    NUMBER
+
+SQL> select constraint_name,column_name,table_name 
+from all_cons_columns where table_name ='EMP400';  2  
+
+CONSTRAINT_NAME
+------------------------------
+COLUMN_NAME
+--------------------------------------------------------------------------------
+TABLE_NAME
+------------------------------
+EMP400_EMPNO_DEPTNO_P
+DEPTNO
+EMP400
+
+EMP400_EMPNO_DEPTNO_P
+EMPNO
+EMP400
+
+CONSTRAINT_NAME
+------------------------------
+COLUMN_NAME
+--------------------------------------------------------------------------------
+TABLE_NAME
+------------------------------
+
+
+SQL> desc user_cons_columns;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ OWNER					   NOT NULL VARCHAR2(30)
+ CONSTRAINT_NAME			   NOT NULL VARCHAR2(30)
+ TABLE_NAME				   NOT NULL VARCHAR2(30)
+ COLUMN_NAME					    VARCHAR2(4000)
+ POSITION					    NUMBER
+
+SQL> desc all_cons_columns;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ OWNER					   NOT NULL VARCHAR2(30)
+ CONSTRAINT_NAME			   NOT NULL VARCHAR2(30)
+ TABLE_NAME				   NOT NULL VARCHAR2(30)
+ COLUMN_NAME					    VARCHAR2(4000)
+ POSITION					    NUMBER
+
+SQL> quit;
+Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+[sql@host4 ~]$ . oraenv
+ORACLE_SID = [sql] ? 
+The Oracle base remains unchanged with value /u01/app/sql
+[sql@host4 ~]$ sqlplus
+
+SQL*Plus: Release 11.2.0.4.0 Production on Thu Aug 29 11:51:24 2019
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+Enter user-name: sys as sysdba
+Enter password: 
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> show user;
+USER is "SYS"
+SQL> connect scott/tiger;
+Connected.
+SQL> create table emp500(empno number constraint emp500_pk primary key,ename varchar(25),sal number);
+
+Table created.
+
+SQL> desc user_constraints;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ OWNER						    VARCHAR2(30)
+ CONSTRAINT_NAME			   NOT NULL VARCHAR2(30)
+ CONSTRAINT_TYPE				    VARCHAR2(1)
+ TABLE_NAME				   NOT NULL VARCHAR2(30)
+ SEARCH_CONDITION				    LONG
+ R_OWNER					    VARCHAR2(30)
+ R_CONSTRAINT_NAME				    VARCHAR2(30)
+ DELETE_RULE					    VARCHAR2(9)
+ STATUS 					    VARCHAR2(8)
+ DEFERRABLE					    VARCHAR2(14)
+ DEFERRED					    VARCHAR2(9)
+ VALIDATED					    VARCHAR2(13)
+ GENERATED					    VARCHAR2(14)
+ BAD						    VARCHAR2(3)
+ RELY						    VARCHAR2(4)
+ LAST_CHANGE					    DATE
+ INDEX_OWNER					    VARCHAR2(30)
+ INDEX_NAME					    VARCHAR2(30)
+ INVALID					    VARCHAR2(7)
+ VIEW_RELATED					    VARCHAR2(14)
+
+SQL> create table emp600(empno number primary key,ename varchar(15),sal number);
+
+Table created.
+
+SQL> desc all_cons_columns;
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ OWNER					   NOT NULL VARCHAR2(30)
+ CONSTRAINT_NAME			   NOT NULL VARCHAR2(30)
+ TABLE_NAME				   NOT NULL VARCHAR2(30)
+ COLUMN_NAME					    VARCHAR2(4000)
+ POSITION					    NUMBER
+
+SQL> select constraint_name,constraint_type,table_name 
+from user_constraints where table_name ='EMP600';  2  
+
+CONSTRAINT_NAME 	       C TABLE_NAME
+------------------------------ - ------------------------------
+SYS_C0012556		       P EMP600
+
+SQL> desc dict
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ TABLE_NAME					    VARCHAR2(30)
+ COMMENTS					    VARCHAR2(4000)
+
+SQL> alter table emp400 disable constraint emp400_pk;
+alter table emp400 disable constraint emp400_pk
+*
+ERROR at line 1:
+ORA-02431: cannot disable constraint (EMP400_PK) - no such constraint
+
+
+SQL> alter table emp600 disable conatraint sys_c0012556;
+alter table emp600 disable conatraint sys_c0012556
+                           *
+ERROR at line 1:
+ORA-00905: missing keyword
+
+
+SQL> alter table emp600 disable constraint sys_c0012556;
+
+Table altered.
+
+SQL> spool '/home/sql/mrunali/practice3.txt';
+SQL> alter table emp600 enable constraint sys_c0012556;
+
+Table altered.
+
+SQL> select constraint_name,constraint_type,table_name 
+from user_constraints where table_name ='EMP600';   2  
+
+CONSTRAINT_NAME 	       C TABLE_NAME
+------------------------------ - ------------------------------
+SYS_C0012556		       P EMP600
+
+SQL> alter table emp600 drop constraint sys_c0012556;
+
+Table altered.
+
+select constraint_name,constraint_type,table_name from user_constraints where table_name ='EMP800';  
+
+no rows selected
+
+create table emp800( empno number, ename varchar(15) constraint ename_nn not null,
+email varchar2(15),
+sal number,
+deptno number,
+constraint emp800_p primary key (empno),
+constraint emp800_u unique(email),
+constraint emp800_c check(sal>=5000),
+constraint emp800_r foreign key (deptno) references dept(deptno));
+
+
+
+
+
+
+select empno,ename,e.dname,loc from emp e , dept d; 
+
+select empno,ename,dname,loc from emp cross join dept
+where loc='BOSTON';
+select empno,ename,deptno,loc from emp e ,dept
+where loc='BOSTON';
+
+select e.empno,e.ename,e.deptno,d.deptno,d.dname from emp e, dept d
+where e.deptno=d.deptno;
+select e.empno,e.ename,e.deptno,d.deptno,d.dname from emp e join dept d
+on (e.deptno=d.deptno);
+
+
+select e.employee_id,e.first_name,d.department_id,d.department_name,l.location_id,l.city 
+from employees e,departments d,locations l 
+where e.department_id= d.department_id and l.location_id = d.location_id;
+
+select e.employee_id,e.first_name,d.department_id,d.department_name,l.location_id,l.city 
+from employees e join departments d on(e.department_id= d.department_id) join locations l 
+on(l.location_id = d.location_id);
+
+select e.employee_id,e.first_name,d.department_id,d.department_name from employees e, departments d 
+where e.department_id(+) = d.department_id;
+
+
+select e.employee_id,e.first_name,d.department_id,d.department_name from employees e join departments d 
+on(e.department_id = d.department_id) and e.manager_id=d.manager_id;
+select e.employee_id,e.first_name,d.department_id,d.department_name from employees e natural join departments d;
+
+
+select e.employee_id,e.first_name,department_id,d.department_name from employees e join departments d using(department_id);
+
+select e.employee_id,e.first_name,e.salary, j.job_id,j.min_salary,j.max_salary from employees e,jobs j where e.salary between j.min_salary and j.max_salary;
+select e.employee_id,e.first_name,e.salary, j.job_id,j.min_salary,j.max_salary from employees e,jobs j where e.salary > j.min_salary;
+
+
+
+
+
+select e.employee_id,e.first_name,d.department_id,d.department_name from employees e, departments d 
+where e.department_id = d.department_id and e.manager_id =d.manager_id;
+
+select w.ename|| '  Regarts to  '|| m.ename from emp w,emp m where m.empno=
+
+select e.empno,e.ename,e.sal,e.deptno from emp e where sal > 
+(select sal from emp where ename='ALLEN');
+
+select first_name ,job_id, salary ,decode(job_id,'SH_CLERK',1.10* salary,'MK_MAN',1.20* salary ,'HR_REP',1.30* salary, salary) "revised salary" from employees;
+
+select employee_id,last_name,salary,round(1.155*salary,0) as "new salary" from employees;
+
+select employee_id,last_name,salary,round(1.155*salary,0) as "new salary",round(1.155*salary - salary,0) as "increase" from employees;
+
+select initcap(last_name),length(last_name) as "length" from employees where last_name like 'J%' or last_name like'A%' or last_name like 'M%' order by last_name;
+
+select initcap(last_name) "name", length(last_name) "length" from employees where last_name like upper('&start_letter%') order by last_name;
+
+
+	select last_name ,round(months_between(sysdate, hire_date)) as "Months_worked" from employees order by 2 ;
+SELECT last_name ,lpad(salary,15,'$') as "salary" from employees;
+
+select last_name, trunc((sysdate - hire_date)/ 7) as Tenure from employees where department_id=90 order by Tenure desc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

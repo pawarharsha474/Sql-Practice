@@ -1,0 +1,8 @@
+SQL> alter table emp600 enable constraint sys_c0012556;
+alter table emp600 enable constraint sys_c0012556
+*
+ERROR at line 1:
+ORA-02430: cannot enable constraint (SYS_C0012556) - no such constraint 
+
+
+SQL> spool off;
